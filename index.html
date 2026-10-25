@@ -17,10 +17,10 @@
     <section class="hero"><span class="eyebrow"><span class="spark">✦</span> Find it nearby</span><h1>Know when your phone<br>is ready to pick up.</h1><p>Check nearby store availability and save a search to get notified when your chosen configuration appears.</p></section>
     <section class="card checker" id="checker">
       <p class="step-title">Choose a product</p>
-      <div class="products" role="group" aria-label="Product"><button class="product active">Phone 18 Pro</button><button class="product">Phone 18 Pro Max</button><button class="product">Phone 18</button><button class="product">Phone Air</button></div>
+      <div class="products" role="group" aria-label="Product"><button class="product active" data-model="iphone-18-pro">iPhone 18 Pro</button><button class="product" data-model="iphone-18-pro-max">iPhone 18 Pro Max</button><button class="product" data-model="iphone-duo">iPhone Duo</button><button class="product" data-model="iphone-air">iPhone Air</button><button class="product" data-model="iphone-17">iPhone 17</button><button class="product" data-model="iphone-17e">iPhone 17e</button><button class="product" data-model="iphone-16">iPhone 16</button></div>
       <div class="fields">
-        <div class="field"><label for="color">Color</label><select id="color"><option>Deep Blue</option><option>Silver</option><option>Midnight</option><option>Rose</option></select></div>
-        <div class="field"><label for="storage">Storage</label><select id="storage"><option>256 GB</option><option>512 GB</option><option>1 TB</option></select></div>
+        <div class="field"><label for="color">Color</label><select id="color"></select></div>
+        <div class="field"><label for="storage">Storage</label><select id="storage"></select></div>
         <div class="field"><label for="location">ZIP code or city</label><input id="location" value="San Francisco, CA" placeholder="Enter ZIP code or city"></div>
       </div>
       <div class="actions"><span class="helper">Demo experience · availability shown below is sample data</span><button class="primary" id="check">Check nearby stores&nbsp; →</button></div>
@@ -41,7 +41,20 @@
   <div class="toast" id="toast" role="status"></div>
   <script>
     const results=document.querySelector('#results'), locationInput=document.querySelector('#location'), searched=document.querySelector('#searched'), toast=document.querySelector('#toast');
-    document.querySelectorAll('.product').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('.product').forEach(item=>item.classList.remove('active'));button.classList.add('active')}));
+    const models={
+      'iphone-18-pro':{colors:['Black','Silver','Glacier','Burgundy'],storage:['256 GB','512 GB','1 TB','2 TB']},
+      'iphone-18-pro-max':{colors:['Black','Silver','Glacier','Burgundy'],storage:['256 GB','512 GB','1 TB','2 TB']},
+      'iphone-duo':{colors:['Night Sky','Star White'],storage:['256 GB','512 GB','1 TB','2 TB']},
+      'iphone-air':{colors:['Sky Blue','Light Gold','Cloud White','Space Black'],storage:['256 GB','512 GB','1 TB']},
+      'iphone-17':{colors:['Lavender','Mist Blue','White','Sage','Black'],storage:['256 GB','512 GB']},
+      'iphone-17e':{colors:['Soft Pink','White','Black'],storage:['256 GB','512 GB']},
+      'iphone-16':{colors:['Ultramarine','Teal','Pink','White','Black'],storage:['128 GB','256 GB','512 GB']}
+    };
+    const colorSelect=document.querySelector('#color'), storageSelect=document.querySelector('#storage');
+    function setOptions(select, options){select.replaceChildren(...options.map((value,index)=>{const option=document.createElement('option');option.value=value;option.textContent=value;option.selected=index===0;return option}))}
+    function chooseModel(button){document.querySelectorAll('.product').forEach(item=>item.classList.toggle('active',item===button));const model=models[button.dataset.model];setOptions(colorSelect,model.colors);setOptions(storageSelect,model.storage)}
+    document.querySelectorAll('.product').forEach(button=>button.addEventListener('click',()=>chooseModel(button)));
+    chooseModel(document.querySelector('.product.active'));
     document.querySelector('#check').addEventListener('click',()=>{const place=locationInput.value.trim();if(!place){locationInput.focus();locationInput.setCustomValidity('Enter a ZIP code or city');locationInput.reportValidity();return}locationInput.setCustomValidity('');searched.textContent=`Sample results near ${place}`;results.classList.add('show');results.scrollIntoView({behavior:'smooth',block:'nearest'})});
     function flash(message){toast.textContent=message;toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),2300)}
     document.querySelectorAll('.notify').forEach(button=>button.addEventListener('click',()=>{button.classList.toggle('on');button.textContent=button.classList.contains('on')?'✓ Saved':'＋ Notify me';flash(button.classList.contains('on')?'Search saved for this demo.':'Demo alert removed.')}));
